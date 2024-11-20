@@ -1,6 +1,9 @@
 from configargparse import ArguementParser
 from load_llff import load_llff_data
 import numpy as np
+from nerf import NeRF,positional_encoding
+import torch
+
 
 def train():
     parser = ArguementParser()
