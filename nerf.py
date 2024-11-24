@@ -11,6 +11,32 @@ def positional_encoding(inputs, num_freqs=10):
         encoded.append(torch.cos(inputs * freq))
     return torch.cat(encoded, dim=-1)
 
+def fn_chunks(nn, chunk):
+    """Defines 'nn' for input chunks"""
+    if chunk is None:
+        return nn
+
+    def ret(inputs):
+        return torch.concat([nn(inputs[i:i+chunk]) for i in range(0, inputs.shape[0], chunk)], 0)
+    return ret
+
+def run_network(inputs, viewdirs, nn, embed, embeddirs, netchunk=1024*64):
+    """Applies neural network 'nn' to inputs"""
+
+    inputs_flat = torch.reshape(inputs, [-1, inputs.shape[-1]])
+
+    embedded = embed(inputs_flat)
+    if viewdirs is not None:
+        input_dirs = torch.broadcast_to(viewdirs[:, None], inputs.shape)
+        input_dirs_flat = torch.reshape(input_dirs, [-1, input_dirs.shape[-1]])
+        embedded_dirs = embeddirs(input_dirs_flat)
+        embedded = torch.concat([embedded, embedded_dirs], -1)
+
+    outputs_flat = fn_chunks(nn, netchunk)(embedded)
+    outputs = torch.reshape(outputs_flat, list(
+        inputs.shape[:-1]) + [outputs_flat.shape[-1]])
+    return outputs
+
 class NeRF(nn.Module):
     def __init__(self, D=8, W=256, input_ch=3, input_ch_views=3, output_ch=4, skips=[4], use_viewdirs=False):
 
@@ -82,7 +108,7 @@ def create_nerf(args):
     skips = [4]  # Skip connections at layer 4
     model = NeRF(D=args.netdepth, W=args.netwidth,
                  input_ch=input_ch, output_ch=output_ch, skips=skips,
-                 input_ch_views=input_ch_views, use_viewdirs=args.use_viewdirs).to(device)
+                 input_ch_views=input_ch_views, use_viewdirs=args.use_viewdirs).to(args.device)
 
     # Collect parameters for optimization
     grad_vars = list(model.parameters())
