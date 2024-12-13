@@ -1,0 +1,50 @@
+{
+    "training_parameters": {
+        "lrate": 0.001,
+        "batch_size": 1024,
+        "num_epochs": 100
+    },
+    "model_parameters": {
+        "hidden_dim": 256,
+        "num_layers": 8,
+        "netdepth": 8,
+        "netwidth": 256,
+        "netdepth_fine": 8,
+        "netwidth_fine": 256,
+        "N_importance": 128,
+        "N_samples": 64,
+        "perturb": 1.0,
+        "use_viewdirs": true,
+        "i_embed": 0,
+        "multires": 10,
+        "multires_views": 4,
+        "raw_noise_std": 0.0
+    },
+    "dataset_parameters": {
+        "dataset_path": "/fern",
+        "image_height": 800,
+        "image_width": 800,
+        "dataset_type": "llff",
+        "no_ndc": true,
+        "lindisp": false
+    },
+    "rendering_parameters": {
+        "near_plane": 0.1,
+        "far_plane": 4.0,
+        "num_samples": 64,
+        "num_importance_samples": 128,
+        "white_bkgd": false
+    },
+    "logging_parameters": {
+        "log_interval": 10,
+        "checkpoint_interval": 1000,
+        "output_dir": "/out",
+        "basedir": "out",
+        "expname": "fern",
+        "ft_path": null,
+        "no_reload": false
+    },
+    "device_parameters": {
+        "device": "cpu"
+    }
+}

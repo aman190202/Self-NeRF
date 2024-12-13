@@ -11,7 +11,7 @@ def positional_encoding(inputs, num_freqs=10):
         encoded.append(torch.cos(inputs * freq))
     return torch.cat(encoded, dim=-1)
 
-def fn_chunks(nn, chunk):
+def nn_chunks(nn, chunk):
     """Defines 'nn' for input chunks"""
     if chunk is None:
         return nn
@@ -32,7 +32,7 @@ def run_network(inputs, viewdirs, nn, embed, embeddirs, netchunk=1024*64):
         embedded_dirs = embeddirs(input_dirs_flat)
         embedded = torch.concat([embedded, embedded_dirs], -1)
 
-    outputs_flat = fn_chunks(nn, netchunk)(embedded)
+    outputs_flat = nn_chunks(nn, netchunk)(embedded)
     outputs = torch.reshape(outputs_flat, list(
         inputs.shape[:-1]) + [outputs_flat.shape[-1]])
     return outputs
